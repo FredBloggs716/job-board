@@ -4,13 +4,15 @@ import Column from './Column'
 import UnassignedPool from './UnassignedPool'
 import StaffCard from './StaffCard'
 
-export default function Board({ staff, jobs, allocations, onMove }) {
+export default function Board({ staff, jobs, allocations, onMove, isAdmin }) {
   const [activeId, setActiveId] = useState(null)
 
-  const sensors = useSensors(
+  const enabledSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   )
+  const disabledSensors = useSensors()
+  const sensors = isAdmin ? enabledSensors : disabledSensors
 
   function getStaffForBucket(bucketId) {
     return staff.filter(p => (allocations[p.name] ?? 'unassigned') === bucketId)
@@ -40,7 +42,7 @@ export default function Board({ staff, jobs, allocations, onMove }) {
 
   function handleDragEnd({ active, over }) {
     setActiveId(null)
-    if (!over || active.id === over.id) return
+    if (!isAdmin || !over || active.id === over.id) return
     const targetBucket = over.id
     const validBuckets = [...jobs.map(j => j.ref), 'leave', 'other', 'unassigned']
     if (validBuckets.includes(targetBucket)) {
@@ -71,12 +73,13 @@ export default function Board({ staff, jobs, allocations, onMove }) {
               accentColor={col.accentColor}
               job={col.job}
               staffList={col.staffList}
+              isAdmin={isAdmin}
             />
           ))}
         </div>
 
         {/* Unassigned pool */}
-        <UnassignedPool staffList={unassigned} />
+        <UnassignedPool staffList={unassigned} isAdmin={isAdmin} />
       </div>
 
       <DragOverlay dropAnimation={{ duration: 200, easing: 'ease-out' }}>

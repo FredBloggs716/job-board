@@ -14,7 +14,7 @@ function typeChipClass(type) {
   return TYPE_COLORS[key] || TYPE_COLORS.default
 }
 
-export default function Column({ id, label, accentColor, job, staffList }) {
+export default function Column({ id, label, accentColor, job, staffList, isAdmin }) {
   const { setNodeRef, isOver } = useDroppable({ id })
 
   const borderColor = {
@@ -92,7 +92,7 @@ export default function Column({ id, label, accentColor, job, staffList }) {
         ].join(' ')}
       >
         {staffList.map(person => (
-          <StaffCard key={person.name} person={person} />
+          <StaffCard key={person.name} person={person} isDraggable={isAdmin} />
         ))}
         {isOver && staffList.length === 0 && (
           <div className={`rounded-xl border-2 border-dashed ${borderColor} h-16 flex items-center justify-center`}>

@@ -16,28 +16,31 @@ function initials(name) {
   return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 }
 
-export default function StaffCard({ person, isDragOverlay }) {
+export default function StaffCard({ person, isDragOverlay, isDraggable = true }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: person.name,
     data: { person },
   })
 
-  const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined
+  const style = transform && isDraggable ? { transform: CSS.Translate.toString(transform) } : undefined
 
   return (
     <div
-      ref={isDragOverlay ? undefined : setNodeRef}
+      ref={isDragOverlay || !isDraggable ? undefined : setNodeRef}
       style={isDragOverlay ? undefined : style}
-      {...(isDragOverlay ? {} : { ...listeners, ...attributes })}
+      {...(isDragOverlay || !isDraggable ? {} : { ...listeners, ...attributes })}
       className={[
-        'flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-grab active:cursor-grabbing',
+        'flex items-center gap-2.5 px-3 py-2.5 rounded-xl',
+        isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-default',
         'bg-surface-raised border border-surface-border select-none',
         'transition-all duration-150',
         isDragOverlay
           ? 'shadow-2xl shadow-black/50 ring-2 ring-brand scale-105 rotate-1'
-          : isDragging
+          : isDragging && isDraggable
             ? 'opacity-30 ring-1 ring-brand/50'
-            : 'hover:border-slate-600 hover:bg-[#21262d]',
+            : isDraggable
+              ? 'hover:border-slate-600 hover:bg-[#21262d]'
+              : '',
       ].join(' ')}
     >
       <div className={`w-7 h-7 rounded-lg ${getColor(person.name)} flex items-center justify-center flex-shrink-0`}>

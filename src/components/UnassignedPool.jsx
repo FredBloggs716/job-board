@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import StaffCard from './StaffCard'
 
-export default function UnassignedPool({ staffList }) {
+export default function UnassignedPool({ staffList, isAdmin }) {
   const { setNodeRef, isOver } = useDroppable({ id: 'unassigned' })
 
   return (
@@ -14,7 +14,7 @@ export default function UnassignedPool({ staffList }) {
             {staffList.length}
           </span>
         </div>
-        <p className="text-slate-600 text-xs">Drag people up to allocate them</p>
+        {isAdmin && <p className="text-slate-600 text-xs">Drag people up to allocate them</p>}
       </div>
       <div
         ref={setNodeRef}
@@ -24,7 +24,7 @@ export default function UnassignedPool({ staffList }) {
         ].join(' ')}
       >
         {staffList.map(person => (
-          <StaffCard key={person.name} person={person} />
+          <StaffCard key={person.name} person={person} isDraggable={isAdmin} />
         ))}
         {staffList.length === 0 && (
           <div className="flex items-center justify-center w-full h-10">
