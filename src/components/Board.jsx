@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors, closestCenter } from '@dnd-kit/core'
+import { DndContext, DragOverlay, MouseSensor, TouchSensor, useSensor, useSensors, closestCenter } from '@dnd-kit/core'
 import Column from './Column'
 import UnassignedPool from './UnassignedPool'
 import StaffCard from './StaffCard'
@@ -8,8 +8,11 @@ export default function Board({ staff, jobs, allocations, onMove, isAdmin, searc
   const [activeId, setActiveId] = useState(null)
 
   const enabledSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
+    // Mouse for desktop; Touch (press-and-hold) for mobile. Do NOT combine with
+    // PointerSensor — on touch devices they fire together and cancel the drag,
+    // which made cards snap back on phones.
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } })
   )
   const disabledSensors = useSensors()
   const sensors = isAdmin ? enabledSensors : disabledSensors
