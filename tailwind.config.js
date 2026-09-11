@@ -26,13 +26,13 @@ export default {
           deep: '#7C0F18',
           dim: '#2A0C0F',
         },
-        // Functional status colours
+        // Functional status colours (deep enough for white text on solid fills)
         leave: {
-          DEFAULT: '#E0A82E',
+          DEFAULT: '#B0791A',
           dim: '#231A05',
         },
         other: {
-          DEFAULT: '#7C8794',
+          DEFAULT: '#64707B',
           dim: '#14181C',
         },
         pool: {
