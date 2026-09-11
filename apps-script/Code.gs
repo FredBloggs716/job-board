@@ -34,7 +34,13 @@ function isAuthed(payload) {
   return String(payload && payload.password || '') === expected
 }
 
-function doGet() {
+function doGet(e) {
+  // Login check over GET — browsers can read GET responses from Apps Script
+  // (POST responses get redirected and are blocked by CORS).
+  if (e && e.parameter && e.parameter.action === 'login') {
+    return json({ ok: isAuthed({ password: e.parameter.password }) })
+  }
+
   const ss = SpreadsheetApp.openById(SHEET_ID)
   const staff = readSheet(ss, 'Staff', ['name', 'role'])
   const jobs  = readSheet(ss, 'Jobs',  ['ref', 'site', 'type', 'foreman', 'active'])

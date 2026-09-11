@@ -19,10 +19,10 @@ export function useAuth() {
     }
 
     try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'login', password }),
-      })
+      // Verify over GET — the browser can read GET responses from Apps Script
+      // (POST responses get redirected and are blocked by CORS).
+      const url = `${APPS_SCRIPT_URL}?action=login&password=${encodeURIComponent(password)}`
+      const res = await fetch(url)
       const data = await res.json()
       if (data && data.ok) {
         sessionStorage.setItem(PW_KEY, password)
