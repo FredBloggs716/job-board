@@ -4,35 +4,55 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Body / UI
+        sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+        // Display headings (LGH brand)
+        display: ['Archivo', 'system-ui', 'sans-serif'],
+        // Eyebrows, labels, job refs, spec numbers
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
+        // Charcoal ink ground (warm neutral, LGH brand)
         surface: {
-          DEFAULT: '#161b22',
-          deep: '#0d1117',
-          raised: '#1c2128',
-          border: '#30363d',
+          DEFAULT: '#16191C',
+          deep: '#0F1113',
+          raised: '#1E2226',
+          border: '#2A2F35',
         },
+        // LGH crimson (primary brand)
         brand: {
-          DEFAULT: '#f97316',
-          hover: '#ea6c0a',
-          dim: '#1a0d00',
+          DEFAULT: '#B11722',
+          hover: '#97121C',
+          deep: '#7C0F18',
+          dim: '#2A0C0F',
         },
+        // Functional status colours
         leave: {
-          DEFAULT: '#f59e0b',
-          dim: '#1a1200',
+          DEFAULT: '#E0A82E',
+          dim: '#231A05',
         },
         other: {
-          DEFAULT: '#8b5cf6',
-          dim: '#14082a',
+          DEFAULT: '#7C8794',
+          dim: '#14181C',
         },
         pool: {
-          DEFAULT: '#22c55e',
-          dim: '#052e16',
+          DEFAULT: '#3F9E6A',
+          dim: '#0A1A11',
         },
       },
+      boxShadow: {
+        // Grounded, low-spread (brand pack)
+        card: '0 1px 2px rgba(0,0,0,0.4)',
+        lift: '0 8px 24px rgba(0,0,0,0.45)',
+      },
+      borderRadius: {
+        brand: '8px',
+      },
+      transitionTimingFunction: {
+        brand: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      },
       animation: {
-        'fade-in': 'fadeIn 0.2s ease-out',
+        'fade-in': 'fadeIn 0.22s ease-out',
         shimmer: 'shimmer 1.5s infinite',
       },
       keyframes: {
@@ -43,4 +63,3 @@ export default {
   },
   plugins: [],
 }
-

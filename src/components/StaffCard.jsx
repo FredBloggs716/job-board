@@ -2,8 +2,8 @@ import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 
 const INITIALS_COLORS = [
-  'bg-orange-500', 'bg-blue-500', 'bg-emerald-500', 'bg-violet-500',
-  'bg-rose-500', 'bg-amber-500', 'bg-cyan-500', 'bg-pink-500',
+  'bg-brand', 'bg-[#2F6FB0]', 'bg-[#3F9E6A]', 'bg-[#7C6BC4]',
+  'bg-[#C0562F]', 'bg-[#B08A2E]', 'bg-[#2E8C97]', 'bg-[#B04A7A]',
 ]
 
 function getColor(name) {
@@ -16,7 +16,7 @@ function initials(name) {
   return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 }
 
-export default function StaffCard({ person, isDragOverlay, isDraggable = true }) {
+export default function StaffCard({ person, isDragOverlay, isDraggable = true, search = '' }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: person.name,
     data: { person },
@@ -24,31 +24,36 @@ export default function StaffCard({ person, isDragOverlay, isDraggable = true })
 
   const style = transform && isDraggable ? { transform: CSS.Translate.toString(transform) } : undefined
 
+  const q = search.trim().toLowerCase()
+  const matches = !q || person.name.toLowerCase().includes(q) || (person.role || '').toLowerCase().includes(q)
+  const dimmed = !matches && !isDragOverlay
+
   return (
     <div
       ref={isDragOverlay || !isDraggable ? undefined : setNodeRef}
       style={isDragOverlay ? undefined : style}
       {...(isDragOverlay || !isDraggable ? {} : { ...listeners, ...attributes })}
       className={[
-        'flex items-center gap-2.5 px-3 py-2.5 rounded-xl',
+        'flex items-center gap-2.5 px-3 py-2.5 rounded-brand',
         isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-default',
-        'bg-surface-raised border border-surface-border select-none',
+        'bg-surface-raised border border-surface-border select-none shadow-card',
         'transition-all duration-150',
+        dimmed ? 'opacity-30 saturate-50' : '',
         isDragOverlay
-          ? 'shadow-2xl shadow-black/50 ring-2 ring-brand scale-105 rotate-1'
+          ? 'shadow-lift ring-2 ring-brand scale-105 rotate-1'
           : isDragging && isDraggable
             ? 'opacity-30 ring-1 ring-brand/50'
             : isDraggable
-              ? 'hover:border-slate-600 hover:bg-[#21262d]'
+              ? 'hover:border-[#3a4048] hover:bg-[#242a30]'
               : '',
       ].join(' ')}
     >
-      <div className={`w-7 h-7 rounded-lg ${getColor(person.name)} flex items-center justify-center flex-shrink-0`}>
-        <span className="text-white text-[10px] font-bold">{initials(person.name)}</span>
+      <div className={`w-7 h-7 rounded-md ${getColor(person.name)} flex items-center justify-center flex-shrink-0`}>
+        <span className="text-white text-[10px] font-bold font-display">{initials(person.name)}</span>
       </div>
       <div className="min-w-0">
         <p className="text-white text-sm font-medium leading-tight truncate">{person.name}</p>
-        <p className="text-slate-500 text-xs leading-tight truncate">{person.role}</p>
+        <p className="text-slate-400 text-[11px] leading-tight truncate">{person.role}</p>
       </div>
     </div>
   )

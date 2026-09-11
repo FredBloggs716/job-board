@@ -1,20 +1,42 @@
 import { useState, useCallback } from 'react'
-import { ADMIN_PASSWORD } from '../config/api'
+import { APPS_SCRIPT_URL, USE_DEMO_DATA } from '../config/api'
+
+const PW_KEY = 'lgh_admin_pw'
 
 export function useAuth() {
-  const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('lgh_admin') === '1')
+  const [isAdmin, setIsAdmin] = useState(() => !!sessionStorage.getItem(PW_KEY))
 
-  const login = useCallback((password) => {
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem('lgh_admin', '1')
+  // Verifies the password against the Apps Script backend (server-side check).
+  // The password is never stored in source — only held in this browser session
+  // after a successful login, and sent with each write request.
+  const login = useCallback(async (password) => {
+    if (!password) return false
+
+    if (USE_DEMO_DATA) {
+      sessionStorage.setItem(PW_KEY, password)
       setIsAdmin(true)
       return true
+    }
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'login', password }),
+      })
+      const data = await res.json()
+      if (data && data.ok) {
+        sessionStorage.setItem(PW_KEY, password)
+        setIsAdmin(true)
+        return true
+      }
+    } catch {
+      // fall through to failure
     }
     return false
   }, [])
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem('lgh_admin')
+    sessionStorage.removeItem(PW_KEY)
     setIsAdmin(false)
   }, [])
 

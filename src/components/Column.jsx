@@ -2,10 +2,10 @@ import { useDroppable } from '@dnd-kit/core'
 import StaffCard from './StaffCard'
 
 const TYPE_COLORS = {
-  groundworks: 'bg-orange-500/20 text-orange-300',
-  drainage: 'bg-blue-500/20 text-blue-300',
-  civils: 'bg-emerald-500/20 text-emerald-300',
-  maintenance: 'bg-amber-500/20 text-amber-300',
+  groundworks: 'bg-[#C0562F]/20 text-[#e6a487]',
+  drainage: 'bg-[#2F6FB0]/20 text-[#9cc2e6]',
+  civils: 'bg-[#3F9E6A]/20 text-[#9cd9b8]',
+  maintenance: 'bg-[#B08A2E]/20 text-[#e0c987]',
   default: 'bg-slate-500/20 text-slate-300',
 }
 
@@ -14,13 +14,13 @@ function typeChipClass(type) {
   return TYPE_COLORS[key] || TYPE_COLORS.default
 }
 
-export default function Column({ id, label, accentColor, job, staffList, isAdmin }) {
+export default function Column({ id, label, accentColor, job, staffList, isAdmin, search }) {
   const { setNodeRef, isOver } = useDroppable({ id })
 
   const borderColor = {
-    brand: 'border-brand/60',
-    leave: 'border-leave/60',
-    other: 'border-other/60',
+    brand: 'border-brand/50',
+    leave: 'border-leave/50',
+    other: 'border-other/50',
   }[accentColor] || 'border-surface-border'
 
   const headerBg = {
@@ -44,32 +44,31 @@ export default function Column({ id, label, accentColor, job, staffList, isAdmin
   return (
     <div className="flex flex-col flex-shrink-0 w-64 max-h-full">
       {/* Column header */}
-      <div className={`rounded-t-2xl border ${borderColor} ${headerBg} px-4 py-3`}>
+      <div className={`rounded-t-brand border ${borderColor} ${headerBg} px-4 py-3`}>
         <div className="flex items-start justify-between gap-2 mb-1">
           <div className="flex items-center gap-2 min-w-0">
             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${dotColor}`} />
-            {job ? (
-              <span className={`text-xs font-bold tracking-wider uppercase ${accentText}`}>{job.ref}</span>
-            ) : (
-              <span className={`text-xs font-bold tracking-wider uppercase ${accentText}`}>{label}</span>
-            )}
+            <span className={`eyebrow text-[11px] font-semibold ${accentText}`}>{job ? job.ref : label}</span>
           </div>
-          <span className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${headerBg} border ${borderColor} ${accentText}`}>
+          <span className={`flex-shrink-0 eyebrow text-[11px] font-semibold px-2 py-0.5 rounded-full ${headerBg} border ${borderColor} ${accentText}`}>
             {staffList.length}
           </span>
         </div>
         {job && (
           <>
-            <h3 className="text-white font-semibold text-sm leading-tight">{job.site}</h3>
+            <h3 className="text-white font-display font-semibold text-sm leading-tight">{job.site}</h3>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {job.type && (
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeChipClass(job.type)}`}>
+                <span className={`eyebrow text-[10px] font-medium px-2 py-0.5 rounded-full ${typeChipClass(job.type)}`}>
                   {job.type}
                 </span>
               )}
               {job.foreman && (
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-300">
-                  👷 {job.foreman}
+                <span className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-300">
+                  <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 3a4 4 0 100 8 4 4 0 000-8zM4 21a8 8 0 0116 0" />
+                  </svg>
+                  {job.foreman}
                 </span>
               )}
             </div>
@@ -86,22 +85,22 @@ export default function Column({ id, label, accentColor, job, staffList, isAdmin
       <div
         ref={setNodeRef}
         className={[
-          'flex-1 min-h-24 rounded-b-2xl border-x border-b p-3 flex flex-col gap-2 transition-colors duration-150 overflow-y-auto scrollbar-hide',
+          'flex-1 min-h-24 rounded-b-brand border-x border-b p-3 flex flex-col gap-2 transition-colors duration-150 overflow-y-auto scrollbar-hide',
           borderColor,
           isOver ? 'bg-surface-raised/80' : 'bg-surface/50',
         ].join(' ')}
       >
         {staffList.map(person => (
-          <StaffCard key={person.name} person={person} isDraggable={isAdmin} />
+          <StaffCard key={person.name} person={person} isDraggable={isAdmin} search={search} />
         ))}
         {isOver && staffList.length === 0 && (
-          <div className={`rounded-xl border-2 border-dashed ${borderColor} h-16 flex items-center justify-center`}>
-            <span className={`text-xs ${accentText}`}>Drop here</span>
+          <div className={`rounded-brand border-2 border-dashed ${borderColor} h-16 flex items-center justify-center`}>
+            <span className={`eyebrow text-[10px] ${accentText}`}>Drop here</span>
           </div>
         )}
         {!isOver && staffList.length === 0 && (
-          <div className="rounded-xl border border-dashed border-surface-border h-16 flex items-center justify-center">
-            <span className="text-xs text-slate-600">Empty</span>
+          <div className="rounded-brand border border-dashed border-surface-border h-16 flex items-center justify-center">
+            <span className="eyebrow text-[10px] text-slate-600">Empty</span>
           </div>
         )}
       </div>

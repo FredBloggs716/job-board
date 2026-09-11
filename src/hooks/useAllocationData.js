@@ -38,11 +38,13 @@ export function useAllocationData() {
   const [jobs, setJobs] = useState([])
   const [allocations, setAllocations] = useState({}) // { staffName: bucketId }
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(null) // null | string
   const [saveState, setSaveState] = useState('idle') // idle | saving | saved | error
   const saveTimerRef = useRef(null)
 
   const load = useCallback(async () => {
     setLoading(true)
+    setLoadError(null)
     try {
       if (USE_DEMO_DATA || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
         await new Promise(r => setTimeout(r, 600))
@@ -53,14 +55,23 @@ export function useAllocationData() {
         setAllocations(allocMap)
       } else {
         const res = await fetch(APPS_SCRIPT_URL)
-        const data = await res.json()
+        if (!res.ok) {
+          throw new Error(`The data feed returned ${res.status}. The Google Apps Script web app is unreachable — it likely needs re-deploying.`)
+        }
+        let data
+        try {
+          data = await res.json()
+        } catch {
+          throw new Error('The data feed did not return valid data (got an HTML error page instead of JSON). The Google Apps Script web app likely needs re-deploying.')
+        }
         const allocMap = {}
-        data.allocations.forEach(a => { allocMap[a.name] = a.bucket })
-        setStaff(data.staff)
-        setJobs(data.jobs.filter(j => j.active?.toLowerCase() === 'yes'))
+        ;(data.allocations || []).forEach(a => { allocMap[a.name] = a.bucket })
+        setStaff(data.staff || [])
+        setJobs((data.jobs || []).filter(j => j.active?.toLowerCase() === 'yes'))
         setAllocations(allocMap)
       }
-    } catch {
+    } catch (err) {
+      setLoadError(err.message || 'Could not load data from the Google Sheet.')
       setSaveState('error')
     } finally {
       setLoading(false)
@@ -76,9 +87,10 @@ export function useAllocationData() {
     saveTimerRef.current = setTimeout(async () => {
       try {
         const body = Object.entries(allocs).map(([name, bucket]) => ({ name, bucket }))
+        const password = sessionStorage.getItem('lgh_admin_pw') || ''
         await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
-          body: JSON.stringify({ allocations: body }),
+          body: JSON.stringify({ allocations: body, password }),
         })
         setSaveState('saved')
         setTimeout(() => setSaveState('idle'), 2000)
@@ -96,5 +108,5 @@ export function useAllocationData() {
     })
   }, [persistAllocations])
 
-  return { staff, jobs, allocations, loading, saveState, handleMove, reload: load }
+  return { staff, jobs, allocations, loading, loadError, saveState, handleMove, reload: load }
 }

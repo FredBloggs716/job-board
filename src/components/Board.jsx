@@ -4,7 +4,7 @@ import Column from './Column'
 import UnassignedPool from './UnassignedPool'
 import StaffCard from './StaffCard'
 
-export default function Board({ staff, jobs, allocations, onMove, isAdmin }) {
+export default function Board({ staff, jobs, allocations, onMove, isAdmin, search }) {
   const [activeId, setActiveId] = useState(null)
 
   const enabledSensors = useSensors(
@@ -74,12 +74,13 @@ export default function Board({ staff, jobs, allocations, onMove, isAdmin }) {
               job={col.job}
               staffList={col.staffList}
               isAdmin={isAdmin}
+              search={search}
             />
           ))}
         </div>
 
         {/* Unassigned pool */}
-        <UnassignedPool staffList={unassigned} isAdmin={isAdmin} />
+        <UnassignedPool staffList={unassigned} isAdmin={isAdmin} search={search} />
       </div>
 
       <DragOverlay dropAnimation={{ duration: 200, easing: 'ease-out' }}>

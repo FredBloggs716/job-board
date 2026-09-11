@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import StaffCard from './StaffCard'
 
-export default function UnassignedPool({ staffList, isAdmin }) {
+export default function UnassignedPool({ staffList, isAdmin, search }) {
   const { setNodeRef, isOver } = useDroppable({ id: 'unassigned' })
 
   return (
@@ -9,12 +9,12 @@ export default function UnassignedPool({ staffList, isAdmin }) {
       <div className="px-6 py-3 flex items-center gap-3">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-pool" />
-          <span className="text-xs font-bold tracking-wider uppercase text-pool">Unassigned Pool</span>
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-pool/10 border border-pool/30 text-pool">
+          <span className="eyebrow text-[11px] font-semibold text-pool">Unassigned Pool</span>
+          <span className="eyebrow text-[11px] font-semibold px-2 py-0.5 rounded-full bg-pool/10 border border-pool/30 text-pool">
             {staffList.length}
           </span>
         </div>
-        {isAdmin && <p className="text-slate-600 text-xs">Drag people up to allocate them</p>}
+        {isAdmin && <p className="text-slate-500 text-xs">Drag people up to allocate them</p>}
       </div>
       <div
         ref={setNodeRef}
@@ -24,7 +24,7 @@ export default function UnassignedPool({ staffList, isAdmin }) {
         ].join(' ')}
       >
         {staffList.map(person => (
-          <StaffCard key={person.name} person={person} isDraggable={isAdmin} />
+          <StaffCard key={person.name} person={person} isDraggable={isAdmin} search={search} />
         ))}
         {staffList.length === 0 && (
           <div className="flex items-center justify-center w-full h-10">

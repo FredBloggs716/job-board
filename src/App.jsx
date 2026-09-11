@@ -8,9 +8,10 @@ import DemoNotice from './components/DemoNotice'
 import LoginModal from './components/LoginModal'
 
 export default function App() {
-  const { staff, jobs, allocations, loading, saveState, handleMove, reload } = useAllocationData()
+  const { staff, jobs, allocations, loading, loadError, saveState, handleMove, reload } = useAllocationData()
   const { isAdmin, login, logout } = useAuth()
   const [showLogin, setShowLogin] = useState(false)
+  const [search, setSearch] = useState('')
 
   const assignedCount = staff.filter(p => {
     const b = allocations[p.name] ?? 'unassigned'
@@ -27,8 +28,24 @@ export default function App() {
         isAdmin={isAdmin}
         onLoginClick={() => setShowLogin(true)}
         onLogout={logout}
+        search={search}
+        onSearch={setSearch}
       />
       <DemoNotice />
+      {loadError && !loading && (
+        <div className="mx-6 mt-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200 flex items-center justify-between gap-4">
+          <span>
+            <strong className="font-semibold text-red-100">Can’t load the live data.</strong>{' '}
+            {loadError}
+          </span>
+          <button
+            onClick={reload}
+            className="shrink-0 rounded-md bg-red-500/20 px-3 py-1.5 font-medium text-red-100 hover:bg-red-500/30 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      )}
       {loading ? (
         <LoadingSkeleton />
       ) : (
@@ -38,6 +55,7 @@ export default function App() {
           allocations={allocations}
           onMove={handleMove}
           isAdmin={isAdmin}
+          search={search}
         />
       )}
       {showLogin && (

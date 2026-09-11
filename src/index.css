@@ -4,10 +4,10 @@
 
 @layer base {
   * { box-sizing: border-box; }
-  html { font-family: 'Inter', system-ui, sans-serif; }
+  html { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
   body {
-    background-color: #0d1117;
-    color: #e6edf3;
+    background-color: #0F1113;
+    color: #F4F3F0;
     margin: 0;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -19,10 +19,17 @@
   .scrollbar-hide { scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-  .drag-over { outline: 2px dashed #f97316; outline-offset: 2px; }
+  .drag-over { outline: 2px dashed #B11722; outline-offset: 2px; }
+
+  /* Mono eyebrow / label treatment (brand pack) */
+  .eyebrow {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
 
   .shimmer {
-    background: linear-gradient(90deg, #161b22 25%, #1c2128 50%, #161b22 75%);
+    background: linear-gradient(90deg, #1E2226 25%, #262b31 50%, #1E2226 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }

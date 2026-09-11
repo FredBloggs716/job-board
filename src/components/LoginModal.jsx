@@ -3,10 +3,15 @@ import { useState } from 'react'
 export default function LoginModal({ onLogin, onClose }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
+  const [busy, setBusy] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    const ok = onLogin(password)
+    if (busy) return
+    setBusy(true)
+    setError(false)
+    const ok = await onLogin(password)
+    setBusy(false)
     if (ok) {
       onClose()
     } else {
@@ -17,21 +22,21 @@ export default function LoginModal({ onLogin, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="bg-surface-raised border border-surface-border rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl"
+        className="bg-surface-raised border border-surface-border rounded-brand p-6 w-full max-w-sm mx-4 shadow-lift"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-brand/20 flex items-center justify-center">
-            <svg className="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          <div className="w-9 h-9 rounded-brand bg-brand/15 border border-brand/30 flex items-center justify-center">
+            <svg className="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
           <div>
-            <h2 className="text-white font-bold text-base leading-tight">Admin Login</h2>
+            <h2 className="text-white font-display font-bold text-base leading-tight uppercase tracking-tight">Admin Login</h2>
             <p className="text-slate-400 text-xs">Enter your password to enable editing</p>
           </div>
         </div>
@@ -42,7 +47,8 @@ export default function LoginModal({ onLogin, onClose }) {
             onChange={e => { setPassword(e.target.value); setError(false) }}
             placeholder="Password"
             autoFocus
-            className="w-full bg-surface-deep border border-surface-border rounded-xl px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-brand transition-colors"
+            disabled={busy}
+            className="w-full bg-surface-deep border border-surface-border rounded-brand px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-brand transition-colors disabled:opacity-60"
           />
           {error && (
             <p className="text-red-400 text-xs flex items-center gap-1.5">
@@ -56,15 +62,16 @@ export default function LoginModal({ onLogin, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-surface-border text-slate-400 text-sm hover:text-white hover:bg-surface-deep transition-colors"
+              className="flex-1 py-2.5 rounded-brand border border-surface-border text-slate-400 text-sm hover:text-white hover:bg-surface-deep transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              disabled={busy}
+              className="flex-1 py-2.5 rounded-brand bg-brand text-white text-sm font-semibold hover:bg-brand-hover transition-colors disabled:opacity-60"
             >
-              Login
+              {busy ? 'Checking…' : 'Login'}
             </button>
           </div>
         </form>
