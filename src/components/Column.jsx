@@ -20,10 +20,12 @@ export default function Column({ id, label, accentColor, job, staffList, isAdmin
 
   // Solid header fill per column type.
   const headerBg = {
+    job: 'bg-[#3d444e]',
+    sick: 'bg-brand',
     brand: 'bg-brand',
     leave: 'bg-leave',
     other: 'bg-other',
-  }[accentColor] || 'bg-slate-500'
+  }[accentColor] || 'bg-[#3d444e]'
 
   // White text sits on top of every solid header.
   const headerText = 'text-white'
@@ -31,16 +33,20 @@ export default function Column({ id, label, accentColor, job, staffList, isAdmin
 
   // Accent used on the light body (drop hints).
   const accentText = {
+    job: 'text-[#3d444e]',
+    sick: 'text-brand',
     brand: 'text-brand',
     leave: 'text-[#8a5e12]',
     other: 'text-[#5b6570]',
-  }[accentColor] || 'text-slate-400'
+  }[accentColor] || 'text-[#3d444e]'
 
   const accentBorder = {
+    job: 'border-[#3d444e]/40',
+    sick: 'border-brand/40',
     brand: 'border-brand/40',
     leave: 'border-leave/50',
     other: 'border-other/50',
-  }[accentColor] || 'border-surface-border'
+  }[accentColor] || 'border-[#3d444e]/40'
 
   return (
     <div className="flex flex-col flex-shrink-0 w-64 max-h-full">

@@ -26,7 +26,8 @@ export default function Board({ staff, jobs, allocations, onMove, isAdmin, searc
   const jobColumns = jobs.map(job => ({
     id: job.ref,
     label: job.ref,
-    accentColor: 'brand',
+    // Job columns are dark grey; the "Sick" column stands out in red.
+    accentColor: /sick/i.test(job.ref) || /sick/i.test(job.site) ? 'sick' : 'job',
     job,
     staffList: getStaffForBucket(job.ref),
   }))
