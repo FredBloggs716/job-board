@@ -18,13 +18,13 @@ export default function Header({ saveState, onReload, totalStaff, assignedCount,
             />
           </div>
           <div>
-            <h1 className="text-white font-display font-extrabold text-lg leading-none tracking-tight uppercase">LGH Job Board</h1>
+            <h1 className="text-slate-900 font-display font-extrabold text-lg leading-none tracking-tight uppercase">LGH Job Board</h1>
             <p className="text-slate-500 text-[11px] mt-1">{today}</p>
           </div>
         </div>
 
         <div className="hidden md:flex items-center gap-2.5 pl-4 border-l border-surface-border">
-          <span className="eyebrow text-[10px] text-slate-400">{assignedCount}/{totalStaff} allocated</span>
+          <span className="eyebrow text-[10px] text-slate-500">{assignedCount}/{totalStaff} allocated</span>
           <div className="w-24 h-1.5 bg-surface-border rounded-full overflow-hidden">
             <div
               className="h-full bg-brand rounded-full transition-all duration-500"
@@ -45,12 +45,12 @@ export default function Header({ saveState, onReload, totalStaff, assignedCount,
             value={search}
             onChange={e => onSearch(e.target.value)}
             placeholder="Find a person…"
-            className="w-full bg-surface-raised border border-surface-border rounded-brand pl-9 pr-8 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-brand transition-colors"
+            className="w-full bg-surface-raised border border-surface-border rounded-brand pl-9 pr-8 py-2 text-slate-900 text-sm placeholder-slate-500 focus:outline-none focus:border-brand transition-colors"
           />
           {search && (
             <button
               onClick={() => onSearch('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-500 hover:text-white"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-500 hover:text-slate-900"
               title="Clear"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
@@ -65,7 +65,7 @@ export default function Header({ saveState, onReload, totalStaff, assignedCount,
         )}
         <button
           onClick={onReload}
-          className="p-2 rounded-brand text-slate-400 hover:text-white hover:bg-surface-raised transition-colors"
+          className="p-2 rounded-brand text-slate-500 hover:text-slate-900 hover:bg-black/5 transition-colors"
           title="Refresh data"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -83,7 +83,7 @@ export default function Header({ saveState, onReload, totalStaff, assignedCount,
             </span>
             <button
               onClick={onLogout}
-              className="p-2 rounded-brand text-slate-400 hover:text-white hover:bg-surface-raised transition-colors"
+              className="p-2 rounded-brand text-slate-500 hover:text-slate-900 hover:bg-black/5 transition-colors"
               title="Logout"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -94,7 +94,7 @@ export default function Header({ saveState, onReload, totalStaff, assignedCount,
         ) : (
           <button
             onClick={onLoginClick}
-            className="flex items-center gap-1.5 pl-2 sm:pl-3 border-l border-surface-border text-slate-500 hover:text-slate-200 transition-colors eyebrow text-[10px]"
+            className="flex items-center gap-1.5 pl-2 sm:pl-3 border-l border-surface-border text-slate-500 hover:text-slate-900 transition-colors eyebrow text-[10px]"
             title="Admin login"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">

@@ -12,12 +12,12 @@ export default {
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        // Charcoal ink ground (warm neutral, LGH brand)
+        // Light concrete ground (warm neutral off-whites, LGH brand)
         surface: {
-          DEFAULT: '#16191C',
-          deep: '#0F1113',
-          raised: '#1E2226',
-          border: '#2A2F35',
+          DEFAULT: '#F6F5F2',
+          deep: '#F1F0EC',
+          raised: '#FFFFFF',
+          border: '#E3E1DC',
         },
         // LGH crimson (primary brand)
         brand: {

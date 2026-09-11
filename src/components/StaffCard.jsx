@@ -44,7 +44,7 @@ export default function StaffCard({ person, isDragOverlay, isDraggable = true, s
           : isDragging && isDraggable
             ? 'opacity-30 ring-1 ring-brand/50'
             : isDraggable
-              ? 'hover:border-[#3a4048] hover:bg-[#242a30]'
+              ? 'hover:border-slate-300 hover:bg-slate-50'
               : '',
       ].join(' ')}
     >
@@ -52,8 +52,8 @@ export default function StaffCard({ person, isDragOverlay, isDraggable = true, s
         <span className="text-white text-[10px] font-bold font-display">{initials(person.name)}</span>
       </div>
       <div className="min-w-0">
-        <p className="text-white text-sm font-medium leading-tight truncate">{person.name}</p>
-        <p className="text-slate-400 text-[11px] leading-tight truncate">{person.role}</p>
+        <p className="text-slate-900 text-sm font-medium leading-tight truncate">{person.name}</p>
+        <p className="text-slate-500 text-[11px] leading-tight truncate">{person.role}</p>
       </div>
     </div>
   )

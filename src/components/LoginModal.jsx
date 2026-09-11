@@ -36,8 +36,8 @@ export default function LoginModal({ onLogin, onClose }) {
             </svg>
           </div>
           <div>
-            <h2 className="text-white font-display font-bold text-base leading-tight uppercase tracking-tight">Admin Login</h2>
-            <p className="text-slate-400 text-xs">Enter your password to enable editing</p>
+            <h2 className="text-slate-900 font-display font-bold text-base leading-tight uppercase tracking-tight">Admin Login</h2>
+            <p className="text-slate-500 text-xs">Enter your password to enable editing</p>
           </div>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -48,7 +48,7 @@ export default function LoginModal({ onLogin, onClose }) {
             placeholder="Password"
             autoFocus
             disabled={busy}
-            className="w-full bg-surface-deep border border-surface-border rounded-brand px-4 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-brand transition-colors disabled:opacity-60"
+            className="w-full bg-surface-deep border border-surface-border rounded-brand px-4 py-2.5 text-slate-900 text-sm placeholder-slate-500 focus:outline-none focus:border-brand transition-colors disabled:opacity-60"
           />
           {error && (
             <p className="text-red-400 text-xs flex items-center gap-1.5">
@@ -62,7 +62,7 @@ export default function LoginModal({ onLogin, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-brand border border-surface-border text-slate-400 text-sm hover:text-white hover:bg-surface-deep transition-colors"
+              className="flex-1 py-2.5 rounded-brand border border-surface-border text-slate-500 text-sm hover:text-slate-900 hover:bg-black/5 transition-colors"
             >
               Cancel
             </button>

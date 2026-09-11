@@ -2,11 +2,11 @@ import { useDroppable } from '@dnd-kit/core'
 import StaffCard from './StaffCard'
 
 const TYPE_COLORS = {
-  groundworks: 'bg-[#C0562F]/20 text-[#e6a487]',
-  drainage: 'bg-[#2F6FB0]/20 text-[#9cc2e6]',
-  civils: 'bg-[#3F9E6A]/20 text-[#9cd9b8]',
-  maintenance: 'bg-[#B08A2E]/20 text-[#e0c987]',
-  default: 'bg-slate-500/20 text-slate-300',
+  groundworks: 'bg-[#C0562F]/15 text-[#9c3f1e]',
+  drainage: 'bg-[#2F6FB0]/15 text-[#1f5488]',
+  civils: 'bg-[#3F9E6A]/15 text-[#2c7a4f]',
+  maintenance: 'bg-[#B08A2E]/15 text-[#856618]',
+  default: 'bg-slate-500/15 text-slate-600',
 }
 
 function typeChipClass(type) {
@@ -56,7 +56,7 @@ export default function Column({ id, label, accentColor, job, staffList, isAdmin
         </div>
         {job && (
           <>
-            <h3 className="text-white font-display font-semibold text-sm leading-tight">{job.site}</h3>
+            <h3 className="text-slate-900 font-display font-semibold text-sm leading-tight">{job.site}</h3>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {job.type && (
                 <span className={`eyebrow text-[10px] font-medium px-2 py-0.5 rounded-full ${typeChipClass(job.type)}`}>
@@ -64,7 +64,7 @@ export default function Column({ id, label, accentColor, job, staffList, isAdmin
                 </span>
               )}
               {job.foreman && (
-                <span className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-300">
+                <span className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
                   <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 3a4 4 0 100 8 4 4 0 000-8zM4 21a8 8 0 0116 0" />
                   </svg>
