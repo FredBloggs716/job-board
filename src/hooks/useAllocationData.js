@@ -1,6 +1,30 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { APPS_SCRIPT_URL, USE_DEMO_DATA } from '../config/api'
 
+// The Apps Script web app cold-starts slowly (often 10-15s) and occasionally
+// throws a transient 404/5xx on the first hit before it warms up. A single
+// fetch therefore fails "a lot of the time". Retry a few times with backoff and
+// a generous per-attempt timeout so one cold start recovers instead of showing
+// "can't load data". Returns the ok Response, or throws after exhausting tries.
+async function fetchWithRetry(url, options = {}, { attempts = 4, timeoutMs = 30000, backoffMs = 1000 } = {}) {
+  let lastError
+  for (let i = 0; i < attempts; i++) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), timeoutMs)
+    try {
+      const res = await fetch(url, { ...options, signal: controller.signal })
+      clearTimeout(timer)
+      if (res.ok) return res
+      lastError = new Error(`the data feed returned ${res.status}`)
+    } catch (err) {
+      clearTimeout(timer)
+      lastError = err?.name === 'AbortError' ? new Error('the data feed timed out') : err
+    }
+    if (i < attempts - 1) await new Promise(r => setTimeout(r, backoffMs * (i + 1)))
+  }
+  throw lastError
+}
+
 const DEMO_DATA = {
   staff: [
     { name: 'Tom Briggs', role: 'Groundworker' },
@@ -54,9 +78,11 @@ export function useAllocationData() {
         setJobs(DEMO_DATA.jobs.filter(j => j.active?.toLowerCase() === 'yes'))
         setAllocations(allocMap)
       } else {
-        const res = await fetch(APPS_SCRIPT_URL)
-        if (!res.ok) {
-          throw new Error(`The data feed returned ${res.status}. The Google Apps Script web app is unreachable — it likely needs re-deploying.`)
+        let res
+        try {
+          res = await fetchWithRetry(APPS_SCRIPT_URL)
+        } catch (err) {
+          throw new Error(`Couldn't reach the data feed after several tries (${err.message}). The Google Apps Script web app may be slow to wake or need re-deploying — press Reload to try again.`)
         }
         let data
         try {
@@ -88,10 +114,10 @@ export function useAllocationData() {
       try {
         const body = Object.entries(allocs).map(([name, bucket]) => ({ name, bucket }))
         const password = sessionStorage.getItem('lgh_admin_pw') || ''
-        await fetch(APPS_SCRIPT_URL, {
+        await fetchWithRetry(APPS_SCRIPT_URL, {
           method: 'POST',
           body: JSON.stringify({ allocations: body, password }),
-        })
+        }, { attempts: 3 })
         setSaveState('saved')
         setTimeout(() => setSaveState('idle'), 2000)
       } catch {
