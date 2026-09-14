@@ -57,6 +57,26 @@ const DEMO_DATA = {
   ],
 }
 
+// Last successful server response, kept in localStorage so the board can paint
+// instantly on the next visit (stale-while-revalidate) and survive a slow or
+// failed refresh instead of showing a blank "can't load data" screen.
+const CACHE_KEY = 'lgh_board_cache'
+function readBoardCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+function writeBoardCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(data))
+  } catch {
+    // storage full / disabled — caching is best-effort, ignore.
+  }
+}
+
 export function useAllocationData() {
   const [staff, setStaff] = useState([])
   const [jobs, setJobs] = useState([])
@@ -66,48 +86,72 @@ export function useAllocationData() {
   const [saveState, setSaveState] = useState('idle') // idle | saving | saved | error
   const saveTimerRef = useRef(null)
 
+  // Push a server-shaped payload ({ staff, jobs, allocations:[...] }) into state.
+  const applyData = useCallback((data) => {
+    const allocMap = {}
+    ;(data.allocations || []).forEach(a => { allocMap[a.name] = a.bucket })
+    setStaff(data.staff || [])
+    setJobs((data.jobs || []).filter(j => j.active?.toLowerCase() === 'yes'))
+    setAllocations(allocMap)
+  }, [])
+
   const load = useCallback(async () => {
-    setLoading(true)
     setLoadError(null)
+
+    if (USE_DEMO_DATA || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+      setLoading(true)
+      await new Promise(r => setTimeout(r, 600))
+      applyData(DEMO_DATA)
+      setLoading(false)
+      return
+    }
+
+    // Stale-while-revalidate: paint the last good data instantly so a slow or
+    // failing refresh never shows a blank board. Only block with the skeleton
+    // when there is nothing cached to show.
+    const cached = readBoardCache()
+    if (cached) {
+      applyData(cached)
+      setLoading(false)
+    } else {
+      setLoading(true)
+    }
+
     try {
-      if (USE_DEMO_DATA || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-        await new Promise(r => setTimeout(r, 600))
-        const allocMap = {}
-        DEMO_DATA.allocations.forEach(a => { allocMap[a.name] = a.bucket })
-        setStaff(DEMO_DATA.staff)
-        setJobs(DEMO_DATA.jobs.filter(j => j.active?.toLowerCase() === 'yes'))
-        setAllocations(allocMap)
-      } else {
-        let res
-        try {
-          res = await fetchWithRetry(APPS_SCRIPT_URL)
-        } catch (err) {
-          throw new Error(`Couldn't reach the data feed after several tries (${err.message}). The Google Apps Script web app may be slow to wake or need re-deploying — press Reload to try again.`)
-        }
-        let data
-        try {
-          data = await res.json()
-        } catch {
-          throw new Error('The data feed did not return valid data (got an HTML error page instead of JSON). The Google Apps Script web app likely needs re-deploying.')
-        }
-        const allocMap = {}
-        ;(data.allocations || []).forEach(a => { allocMap[a.name] = a.bucket })
-        setStaff(data.staff || [])
-        setJobs((data.jobs || []).filter(j => j.active?.toLowerCase() === 'yes'))
-        setAllocations(allocMap)
+      const res = await fetchWithRetry(APPS_SCRIPT_URL)
+      let data
+      try {
+        data = await res.json()
+      } catch {
+        throw new Error('The data feed did not return valid data (got an HTML error page instead of JSON). The Google Apps Script web app likely needs re-deploying.')
       }
+      applyData(data)
+      writeBoardCache({ staff: data.staff || [], jobs: data.jobs || [], allocations: data.allocations || [] })
+      setLoadError(null)
     } catch (err) {
-      setLoadError(err.message || 'Could not load data from the Google Sheet.')
-      setSaveState('error')
+      // If we already painted cached data, keep it on screen and stay quiet —
+      // a failed background refresh shouldn't alarm the user. Only surface the
+      // error when there was no cache to fall back on.
+      if (!cached) {
+        setLoadError(`Couldn't reach the data feed after several tries (${err.message}). The Google Apps Script web app may be slow to wake or need re-deploying — press Reload to try again.`)
+        setSaveState('error')
+      }
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [applyData])
 
   useEffect(() => { load() }, [load])
 
   const persistAllocations = useCallback((allocs) => {
     if (USE_DEMO_DATA || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return
+    // Keep the local cache in step with the optimistic edit so the next visit
+    // paints the just-moved state instantly, even before the server confirms.
+    const cached = readBoardCache()
+    if (cached) {
+      cached.allocations = Object.entries(allocs).map(([name, bucket]) => ({ name, bucket }))
+      writeBoardCache(cached)
+    }
     clearTimeout(saveTimerRef.current)
     setSaveState('saving')
     saveTimerRef.current = setTimeout(async () => {
