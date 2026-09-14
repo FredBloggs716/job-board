@@ -41,12 +41,28 @@ function doGet(e) {
     return json({ ok: isAuthed({ password: e.parameter.password }) })
   }
 
+  // Reading four tabs on every request takes 10-15s, which is what made the
+  // board feel like it "couldn't load". Serve a cached JSON string when we have
+  // one (writes below clear it) so warm reads return near-instantly.
+  const cache = CacheService.getScriptCache()
+  const cached = cache.get(CACHE_KEY)
+  if (cached) return jsonRaw(cached)
+
   const ss = SpreadsheetApp.openById(SHEET_ID)
   const staff = readSheet(ss, 'Staff', ['name', 'role'])
   const jobs  = readSheet(ss, 'Jobs',  ['ref', 'site', 'type', 'foreman', 'active'])
   const alloc = dedupeByName(readSheet(ss, 'Allocations', ['name', 'bucket']))
   const dailyLog = readDailyLog(ss)
-  return json({ staff, jobs, allocations: alloc, dailyLog })
+  const body = JSON.stringify({ staff, jobs, allocations: alloc, dailyLog })
+  // CacheService caps a value at 100KB; only cache when it fits. 6h TTL is a
+  // safety net; writes invalidate immediately so edits are never stale.
+  try { if (body.length < 100000) cache.put(CACHE_KEY, body, 21600) } catch (err) { /* ignore */ }
+  return jsonRaw(body)
+}
+
+const CACHE_KEY = 'boardData_v1'
+function invalidateCache() {
+  try { CacheService.getScriptCache().remove(CACHE_KEY) } catch (err) { /* ignore */ }
 }
 
 function doPost(e) {
@@ -67,6 +83,7 @@ function doPost(e) {
   if (payload.action === 'addJob') {
     const sheet = ss.getSheetByName('Jobs')
     sheet.appendRow([payload.ref, payload.site, payload.type || '', payload.foreman || '', ''])
+    invalidateCache()
     return json({ ok: true })
   }
 
@@ -79,6 +96,7 @@ function doPost(e) {
         break
       }
     }
+    invalidateCache()
     return json({ ok: true })
   }
 
@@ -91,6 +109,7 @@ function doPost(e) {
   sheet.clearContents()
   const rows = [['name', 'bucket']].concat(unique.map(a => [a.name, a.bucket]))
   sheet.getRange(1, 1, rows.length, 2).setValues(rows)
+  invalidateCache()
   return json({ ok: true })
 }
 
@@ -135,7 +154,12 @@ function readDailyLog(ss) {
 }
 
 function json(data) {
-  const output = ContentService.createTextOutput(JSON.stringify(data))
+  return jsonRaw(JSON.stringify(data))
+}
+
+// Build a JSON response from an already-serialized string (used for cache hits).
+function jsonRaw(str) {
+  const output = ContentService.createTextOutput(str)
   output.setMimeType(ContentService.MimeType.JSON)
   return output
 }
